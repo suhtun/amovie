@@ -34,26 +34,5 @@ object RetrofitBuilder {
             .build()
     }
 
-    private fun makeOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor Interceptor@{ chain ->
-                val url = chain.request()
-                    .url
-                    .newBuilder()
-                    .addQueryParameter("api_key", API_KEY)
-                    .build()
-
-                val request = chain.request()
-                    .newBuilder()
-                    .url(url)
-                    .build()
-
-                return@Interceptor chain.proceed(request)
-            }
-            .connectTimeout(120, TimeUnit.SECONDS)
-            .readTimeout(120, TimeUnit.SECONDS)
-            .build()
-    }
-
     val apiService: ApiService = getRetrofit().create(ApiService::class.java)
 }

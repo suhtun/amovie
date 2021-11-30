@@ -2,6 +2,7 @@ package com.su.amovie.ui.main
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -9,9 +10,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.su.amovie.data.mock.Datasource
 import com.su.amovie.R
-import com.su.amovie.data.network.ApiHelper
+import com.su.amovie.data.MainRepository
 import com.su.amovie.data.network.RetrofitBuilder
 import com.su.amovie.ui.base.ViewModelFactory
 import com.su.amovie.utils.Status
@@ -24,7 +24,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         setupViewModel()
         setupUI()
         setupObservers()
@@ -33,14 +32,12 @@ class MainActivity : AppCompatActivity() {
     private fun setupViewModel() {
         viewModel = ViewModelProvider(
             this,
-            ViewModelFactory(ApiHelper(RetrofitBuilder.apiService))
+            ViewModelFactory(MainRepository(RetrofitBuilder.apiService))
         ).get(MainViewModel::class.java)
     }
 
     private fun setupUI() {
-        // Retrieves data from datasource
-//        val flowerList = Datasource(this).getFlowerList()
-
+        // Retrieves data from data
         val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
         val gridLayoutManager = GridLayoutManager(this, 3)
         recyclerView.layoutManager = gridLayoutManager
@@ -52,13 +49,16 @@ class MainActivity : AppCompatActivity() {
     private fun setupObservers() {
         val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
         val txtErrorMessage = findViewById<TextView>(R.id.txt_error_msg)
-        viewModel.getUsers().observe(this, Observer {
+        viewModel.getMovies().observe(this, Observer {
             it?.let { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
                         progressBar.visibility = View.GONE
                         txtErrorMessage.visibility = View.GONE
-                        resource.data?.let { users -> retrieveList(users) }
+                        resource.data?.let { movies ->
+                            retrieveList(movies)
+                            Log.w("main","result: ${movies}")
+                        }
                     }
                     Status.ERROR -> {
                         progressBar.visibility = View.GONE
