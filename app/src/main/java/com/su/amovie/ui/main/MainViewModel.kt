@@ -1,5 +1,7 @@
 package com.su.amovie.ui.main
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.su.amovie.data.MainRepository
@@ -8,7 +10,9 @@ import kotlinx.coroutines.Dispatchers
 
 class MainViewModel(private val mainRepository: MainRepository) : ViewModel() {
 
-    fun getMovies() = liveData(Dispatchers.IO) {
+    val movies : LiveData<Resource<List<MovieUiModel>>> = getMoviesData()
+
+    private fun getMoviesData() = liveData(Dispatchers.IO) {
         emit(Resource.loading(data = null))
         try {
             emit(Resource.success(data = mainRepository.getMovies()))

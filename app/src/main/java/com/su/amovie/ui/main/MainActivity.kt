@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupObservers() {
         val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
         val txtErrorMessage = findViewById<TextView>(R.id.txt_error_msg)
-        viewModel.getMovies().observe(this, Observer {
+        viewModel.movies.observe(this, Observer {
             it?.let { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
